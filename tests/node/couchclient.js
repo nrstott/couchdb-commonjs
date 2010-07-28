@@ -4,26 +4,35 @@ var
   TEST_ID  = "ABC123",
   TEST_DOC = { hello: "world" },
   assert   = require("assert"),
-  COUCHDB  = require("../../lib/couchdb"),
-  client   = COUCHDB.createClient(require("../../lib/node/XMLHttpRequest").XMLHttpRequest, 5984, "localhost", "dev", "asdfasdf"),
+  couchdb  = require("../../lib/couchdb"),
+  when     = require("promised-io/promise").when,
+  client   = couchdb.createClient({ 
+               port: 5984, 
+               host: "192.168.15.52", 
+               user: "dev", 
+               password: "asdfasdf"
+             }),
   sys      = require("sys");
 
-exports["should get all dbs"] = function(assert, beforeExit) {
+exports["should get all dbs"] = function() {
   var 
     hsaRun = false,
     response = null;
-  
-  client.allDbs(function(err, resp) { 
-    hasRun = true;
-    response = resp;
-  });
-  
-  beforeExit(function() {
-    assert.ok(hasRun);
-    assert.notEqual(null, response);
-    assert.ok(Array.isArray(response), "Should be an array");
+    
+  var HttpClient = require("promised-io/http-client").Client;
+  var httpClient = new HttpClient();
+
+  return when(client.allDbs(), function success(resp) {
+    assert.notEqual(null, resp);
+    assert.ok(Array.isArray(resp), "Response should be an array: " + sys.inspect(resp));
+  }, function error(err) {
+    assert.ok(false, err);
   });
 };
+
+if (require.main == module) {
+  require("patr/runner").run(exports);
+}
 
 /*exports["should create db"] = function(assert, beforeExit) {
   var response = null;
@@ -45,7 +54,7 @@ exports["should get all dbs"] = function(assert, beforeExit) {
     assert.notEqual(null, response);
   });
 };*/
-
+/*
 exports["should get UUIDs"] = function(assert, beforeExit) {
   var 
     count  = 5, 
@@ -131,4 +140,4 @@ exports["should save document WITHOUT _id specified"] = function(assert, beforeE
   beforeExit(function() {
     assert.ok(hasRun, "Should have called callback");
   });
-}
+}*/
