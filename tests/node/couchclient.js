@@ -67,7 +67,7 @@ exports["should create and remove db"] = function() {
     });
 };
 
-exports["should get states"] = function() {
+exports["should get stats"] = function() {
   return when(client.stats(),
     function(resp) {
       assert.notEqual(null, resp.couchdb);
