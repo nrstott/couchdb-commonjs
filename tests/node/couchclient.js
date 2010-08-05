@@ -40,7 +40,7 @@ exports["should get UUIDs"] = function() {
   });
 };
 
-exports["shold get config"] = function() {
+exports["should get config"] = function() {
   return when(client.config()
   , function(resp) {
     assert.notEqual(null, resp);
