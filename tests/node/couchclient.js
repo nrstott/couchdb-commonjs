@@ -105,7 +105,6 @@ exports["should replicate"] = function() {
   function before() {
     db = client.db(DB_NAME);
     return when(db.exists(), function(exists) {
-      console.log("exists:"+exists);
       if (exists) {
         return when(db.remove(), function() { 
           return db.create();
@@ -122,10 +121,9 @@ exports["should replicate"] = function() {
   
   var tests = {
     "should have no documents": function() {
-      console.log("allDocs");
       return when(db.allDocs(), function(resp) {
-        assert.ok(Array.isArray(resp.rows));
-        assert.equal(0, resp.rows.length);
+        assert.ok(Array.isArray(resp.rows), "Expected resp.rows to be an array but it is '"+typeof(resp.rows)+"'");
+        assert.equal(0, resp.rows.length, "Expected 0 rows, found '"+resp.rows.length+"'");
       });
     }, 
     "should create document with id": function() {
@@ -137,15 +135,34 @@ exports["should replicate"] = function() {
     "should create document without id": function() {
       return when(db.saveDoc({ hello: "world" }), 
         function(resp) {
-          console.log(JSON.stringify(resp));
           assert.ok(resp.ok);
         });
+    },
+    "should get security object": function() {
+      return when(db.security(), function(resp) {
+        console.log("Secuirty:"+JSON.stringify(resp));
+        assert.deepEqual({}, resp);
+      });
+    },
+    "should set security object": function() {
+      var securityObj = { readers: { names: ["tester"], roles: ["test_reader"] } };
+      return when(db.security(securityObj), function(resp) { 
+        assert.ok(resp.ok);
+        return when(db.security(), function(resp) {
+          assert.deepEqual(resp, securityObj);
+        })
+      });
     }
   };
     
   exports["database tests"] = {};
   
-  for (var test in tests) {
+  var keys= [];
+  for (var k in tests) {
+    keys.push(k);
+  }
+  
+  keys.forEach(function(test) {
     exports["database tests"][test] = function() {
       return when(before(), function() {
         return when(tests[test](), 
@@ -153,12 +170,12 @@ exports["should replicate"] = function() {
             return after();
           }, 
           function(err) {
-            assert.ok(false, err);
-            after();
+            assert.ok(false, err, JSON.stringify(err));
+            return after();
           });
         });
     };
-  }
+  });
 })();
 
 if (require.main == module) {
