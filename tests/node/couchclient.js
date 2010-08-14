@@ -7,12 +7,8 @@ var
   couchdb  = require("../../lib/couchdb"),
   Q        = require("promised-io/promise"),
   when     = Q.when,
-  client   = couchdb.createClient({ 
-               port: 5984, 
-               host: "192.168.15.15", 
-               user: "nathan", 
-               password: "s4stott"
-             }),
+  settings = require("./settings").couchdb,
+  client   = couchdb.createClient(settings),
   sys      = require("sys");
 
 exports["should get all dbs"] = function() {
