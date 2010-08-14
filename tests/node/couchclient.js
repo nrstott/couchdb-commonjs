@@ -30,9 +30,9 @@ exports["should get all dbs"] = function() {
 exports["should get UUIDs"] = function() {
   var count  = 5;
   
-  return when(client.uuids(count), function(resp) {
-    assert.notEqual(null, resp.uuids, "resp.uuids should not be null.  "+JSON.stringify(resp));
-    assert.equal(count, resp.uuids.length, "Expected "+count+" uuids.  "+JSON.stringify(resp.uuids));
+  return when(client.uuids(count), function(uuids) {
+    assert.notEqual(null, uuids, "uuids should not be null.  "+JSON.stringify(uuids));
+    assert.equal(count, uuids.length, "Expected "+count+" uuids.  "+JSON.stringify(uuids));
   });
 };
 
