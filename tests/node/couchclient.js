@@ -74,6 +74,14 @@ exports["should get stats"] = function() {
     });
 };
 
+exports["should get session"] = function() {
+  return when(client.session(), function(resp) {
+    console.log("Session:"+JSON.stringify(resp));
+    assert.notEqual(null, resp);
+    assert.ok(resp.ok);
+  });
+};
+
 exports["should replicate"] = function() {
   var 
     db1 = client.db(DB_NAME),
