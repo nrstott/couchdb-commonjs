@@ -9,9 +9,9 @@ var
   when     = Q.when,
   client   = couchdb.createClient({ 
                port: 5984, 
-               host: "192.168.15.52", 
-               user: "dev", 
-               password: "asdfasdf"
+               host: "192.168.15.15", 
+               user: "nathan", 
+               password: "s4stott"
              }),
   sys      = require("sys");
 
@@ -72,6 +72,14 @@ exports["should get stats"] = function() {
     function(resp) {
       assert.notEqual(null, resp.couchdb);
     });
+};
+
+exports["should get session"] = function() {
+  return when(client.session(), function(resp) {
+    assert.notEqual(null, resp);
+    assert.ok(resp.ok);
+    assert.ok(resp.info);
+  });
 };
 
 exports["should replicate"] = function() {
