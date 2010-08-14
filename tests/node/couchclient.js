@@ -9,9 +9,9 @@ var
   when     = Q.when,
   client   = couchdb.createClient({ 
                port: 5984, 
-               host: "192.168.15.52", 
-               user: "dev", 
-               password: "asdfasdf"
+               host: "192.168.15.15", 
+               user: "nathan", 
+               password: "s4stott"
              }),
   sys      = require("sys");
 
@@ -76,9 +76,9 @@ exports["should get stats"] = function() {
 
 exports["should get session"] = function() {
   return when(client.session(), function(resp) {
-    console.log("Session:"+JSON.stringify(resp));
     assert.notEqual(null, resp);
     assert.ok(resp.ok);
+    assert.ok(resp.info);
   });
 };
 
@@ -189,95 +189,3 @@ exports["should replicate"] = function() {
 if (require.main == module) {
   require("patr/runner").run(exports);
 }
-
-/*exports["should create db"] = function(assert, beforeExit) {
-  var response = null;
-  
-  client.db(DB_NAME).create(function(err, resp) {
-    response = resp;
-  });
-  
-  client.db(DB_NAME).exists(function(err, found) {
-    assert.ok(found);
-  });
-  
-  client.db(DB_NAME).remove(function(err, resp) {
-    assert.equal(null, err, JSON.stringify(err));
-    assert.ok(resp.ok, JSON.stringify(resp));
-  });
-  
-  beforeExit(function() {
-    assert.notEqual(null, response);
-  });
-};*/
-
-/*
-exports["should not find database that does not exist"] = function(assert, beforeExit) {
-  var hasRun = false;
-  
-  client.db("asdfasdfadsfsdukiuy").exists(function(err, found) {
-    hasRun = true;
-    assert.equal(null, err);
-    assert.equal(found, false, "Should not find db that does not exist");
-  });
-  
-  beforeExit(function() {
-    assert.ok(hasRun, "Should have called callback");
-  });
-};
-
-exports["should save documnet WITH _id specified"] = function(assert, beforeExit) {
-  var 
-    hasRun = false,
-    db     = client.db(DB_NAME),
-    doc    = { _id: "test-doc", hello: "world" };
-  
-  db.openDoc(doc._id, function(err, existingDoc) {
-    // Remove the doc if it exists
-    if (!err && existingDoc) {
-      require("sys").puts("Removing existing doc");
-      db.removeDoc(existingDoc._id, existingDoc._rev, function(err, resp) { 
-        require("sys").puts(JSON.stringify(err));
-        require("sys").puts(JSON.stringify(resp));
-      });
-    }
-    
-    db.saveDoc(doc, function(err, resp) {
-      hasRun = true;
-      assert.equal(null, err);
-      assert.equal(doc._id, resp.id, JSON.stringify(resp));
-      assert.equal("string", typeof resp.rev, JSON.stringify(resp));
-      
-      db.removeDoc(doc._id, resp.rev, function(err, resp) { 
-        assert.equal(null, err, JSON.stringify(err));
-      });
-    });
-  });
-  
-  beforeExit(function() {
-    assert.ok(hasRun, "Should have called callback");
-  });
-};
-
-exports["should save document WITHOUT _id specified"] = function(assert, beforeExit) {
-  var 
-    hasRun = false,
-    db     = client.db(DB_NAME),
-    doc    = { hello: "world" };
-  
-  db.saveDoc(doc, function(err, resp) {
-    hasRun = true;
-    assert.equal(null, err);
-    assert.equal("string", typeof resp.id);
-    assert.equal("string", typeof resp.rev);
-    
-    db.removeDoc(resp.id, resp.rev, function(err, resp) {
-      assert.equal(null, err, JSON.stringify(err));
-      assert.ok(resp.ok, JSON.stringify(resp));
-    });
-  });
-  
-  beforeExit(function() {
-    assert.ok(hasRun, "Should have called callback");
-  });
-}*/

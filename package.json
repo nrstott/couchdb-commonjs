@@ -7,6 +7,7 @@
   "mappings": {
     "promised-io": "jar:http://github.com/nrstott/promised-io/zipball/master!/lib/",
     "patr": "jar:http://github.com/kriszyp/patr/zipball/master!/lib/",
-    "json": "jar:http://github.com/kriszyp/narwhal/zipball/master!/engines/default/lib/json.js"
+    "json": "jar:http://github.com/kriszyp/narwhal/zipball/master!/engines/default/lib/json.js",
+    "traits": "jar:http://github.com/nrstott/traits.js/zipball/master!/lib/traits"
   }
 }
