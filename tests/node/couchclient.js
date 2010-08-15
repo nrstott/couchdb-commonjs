@@ -31,6 +31,7 @@ exports["should get UUIDs"] = function() {
   var count  = 5;
   
   return when(client.uuids(count), function(uuids) {
+    console.log("UUIDS:"+JSON.stringify(uuids));
     assert.notEqual(null, uuids, "uuids should not be null.  "+JSON.stringify(uuids));
     assert.equal(count, uuids.length, "Expected "+count+" uuids.  "+JSON.stringify(uuids));
   });
@@ -61,6 +62,36 @@ exports["should create and remove db"] = function() {
     function error(err) {
       assert.ok(false, err);
     });
+};
+
+exports["should signup user"] = function() {
+  return when(client.signup({ name: "tester" }, "asdfasdf"), function(resp) {
+    console.log("signup resp:"+require('sys').inspect(resp));
+    assert.ok(resp.ok);
+  });
+};
+
+exports["should login"] = function() {
+  var cookieClient = couchdb.createClient({
+    host: settings.host,
+    port: settings.port
+  });
+  
+  return when(cookieClient.login(settings.user, settings.password), function(resp) {
+    console.log("login resp:"+require('sys').inspect(resp));
+    assert.ok(resp.ok);
+    
+    var db = cookieClient.db("cookie-auth-creation-test");
+    return when(db.create(), function(resp) {
+      console.log("create response:"+JSON.stringify(resp));
+      assert.ok(resp.ok);
+      
+      return when(db.remove(), function(resp) {
+        console.log("remove respons:"+JSON.stringify(resp));
+        assert.ok(resp.ok);
+      });
+    });
+  });
 };
 
 exports["should get stats"] = function() {
