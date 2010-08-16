@@ -74,10 +74,7 @@ exports["should signup user"] = function() {
     
     return when(client.userDb(), function(userDb) {
       return when(userDb.openDoc(couchdb.USER_PREFIX+name), function(doc) {
-        console.log('removing '+doc._id+' '+doc._rev);
-        return when(userDb.removeDoc(doc._id, doc._rev),function(resp) { console.log('removeDoc resp:'+JSON.stringify(resp)); },function(err){
-          console.log('removeDoc err: '+JSON.stringify(err));
-        });
+        return userDb.removeDoc(doc._id, doc._rev);
       })
     });
   });
