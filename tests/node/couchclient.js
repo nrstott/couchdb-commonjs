@@ -65,9 +65,21 @@ exports["should create and remove db"] = function() {
 };
 
 exports["should signup user"] = function() {
-  return when(client.signup({ name: "tester" }, "asdfasdf"), function(resp) {
-    console.log("signup resp:"+require('sys').inspect(resp));
+  var
+    name = "tester",
+    signupPromise = client.signup({ name: name }, "asdfasdf");
+  
+  return when(signupPromise, function(resp) {
     assert.ok(resp.ok);
+    
+    return when(client.userDb(), function(userDb) {
+      return when(userDb.openDoc(couchdb.USER_PREFIX+name), function(doc) {
+        console.log('removing '+doc._id+' '+doc._rev);
+        return when(userDb.removeDoc(doc._id, doc._rev),function(resp) { console.log('removeDoc resp:'+JSON.stringify(resp)); },function(err){
+          console.log('removeDoc err: '+JSON.stringify(err));
+        });
+      })
+    });
   });
 };
 
@@ -78,16 +90,13 @@ exports["should login"] = function() {
   });
   
   return when(cookieClient.login(settings.user, settings.password), function(resp) {
-    console.log("login resp:"+require('sys').inspect(resp));
     assert.ok(resp.ok);
     
     var db = cookieClient.db("cookie-auth-creation-test");
     return when(db.create(), function(resp) {
-      console.log("create response:"+JSON.stringify(resp));
       assert.ok(resp.ok);
       
       return when(db.remove(), function(resp) {
-        console.log("remove respons:"+JSON.stringify(resp));
         assert.ok(resp.ok);
       });
     });
@@ -120,7 +129,6 @@ exports["should replicate"] = function() {
       return when(
         client.replicate(DB_NAME, DB_NAME2),
         function(resp) {
-          console.log("replicate response:"+JSON.stringify(resp));
           assert.ok(resp);
           assert.ok(!resp.error);
         },
@@ -143,6 +151,8 @@ exports["should replicate"] = function() {
       if (exists) {
         return when(db.remove(), function() { 
           return db.create();
+        }, function() { 
+          console.log("could not remove db");
         });
       } else {
         return db.create();
@@ -162,7 +172,19 @@ exports["should replicate"] = function() {
       });
     }, 
     "should create document with id": function() {
-      return when(db.saveDoc({ _id: "ABC123", hello: "world" }), function(resp) {
+      var
+        docId = "ABC123",
+        saveDocPromise = db.saveDoc({ _id: docId, hello: "world" });
+      
+      saveDocPromise.then(function() {
+        db.openDoc(docId).then(function(doc) {
+          if (doc !== null) {
+            db.removeDoc(doc._id, doc._rev);
+          }
+        });
+      });
+      
+      return when(saveDocPromise, function(resp) {
         assert.notEqual(null, resp);
         assert.ok(resp.ok);
       });
@@ -175,7 +197,6 @@ exports["should replicate"] = function() {
     },
     "should get security object": function() {
       return when(db.security(), function(resp) {
-        console.log("Secuirty:"+JSON.stringify(resp));
         assert.deepEqual({}, resp);
       });
     },
@@ -186,6 +207,36 @@ exports["should replicate"] = function() {
         return when(db.security(), function(resp) {
           assert.deepEqual(resp, securityObj);
         })
+      });
+    },
+    "should remove document": function() {
+      var
+        docId = "ABCZZZ",
+        saveDocPromise = db.saveDoc({ _id: docId });
+      
+      return when(saveDocPromise, function(resp) {
+        return when(db.removeDoc(resp.id, resp.rev), function(resp) {
+          assert.ok(resp.ok);
+        });
+      });
+    },
+    "should be conflicted": function() {
+      return when(db.saveDoc( { _id: "hello-world" }), function() {
+        var conflictPromise = db.saveDoc({ _id: "hello-world" });
+        
+        function removeDoc() {
+          return db.openDoc("hello-world").then(function(doc) {
+            return db.removeDoc(doc._id, doc._rev);
+          });
+        }
+        
+        return when(conflictPromise, function() { 
+          assert.ok(false);
+          return removeDoc();
+        }, function(err) { 
+          assert.ok(err);
+          removeDoc();
+        });
       });
     }
   };
@@ -205,6 +256,7 @@ exports["should replicate"] = function() {
             return after();
           }, 
           function(err) {
+            console.log("ERR:"+JSON.stringify(err));
             assert.ok(false, err, JSON.stringify(err));
             return after();
           });
