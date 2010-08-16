@@ -31,7 +31,6 @@ exports["should get UUIDs"] = function() {
   var count  = 5;
   
   return when(client.uuids(count), function(uuids) {
-    console.log("UUIDS:"+JSON.stringify(uuids));
     assert.notEqual(null, uuids, "uuids should not be null.  "+JSON.stringify(uuids));
     assert.equal(count, uuids.length, "Expected "+count+" uuids.  "+JSON.stringify(uuids));
   });
@@ -95,6 +94,10 @@ exports["should login"] = function() {
       
       return when(db.remove(), function(resp) {
         assert.ok(resp.ok);
+        
+        return when(cookieClient.logout(), function(resp) { 
+          assert.ok(resp.ok);
+        });
       });
     });
   });
