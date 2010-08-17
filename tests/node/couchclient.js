@@ -86,17 +86,18 @@ exports["should login"] = function() {
   });
   
   return when(cookieClient.login(settings.user, settings.password), function(resp) {
-    assert.ok(resp.ok);
-    
-    var db = cookieClient.db("cookie-auth-creation-test");
-    return when(db.create(), function(resp) {
-      assert.ok(resp.ok);
-      
-      return when(db.remove(), function(resp) {
+    return when(couchdb.parseBody(resp), function(body) {
+      assert.ok(body.ok);
+      var db = cookieClient.db("cookie-auth-creation-test");
+      return when(db.create(), function(resp) {
         assert.ok(resp.ok);
         
-        return when(cookieClient.logout(), function(resp) { 
+        return when(db.remove(), function(resp) {
           assert.ok(resp.ok);
+          
+          return when(cookieClient.logout(), function(resp) { 
+            assert.ok(resp.ok);
+          });
         });
       });
     });
