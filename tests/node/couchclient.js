@@ -11,7 +11,7 @@ var
   client   = couchdb.createClient(settings),
   sys      = require("sys");
 
-exports["should get all dbs"] = function() {
+exports["test should get all dbs"] = function() {
   var 
     hsaRun = false,
     response = null;
@@ -27,7 +27,7 @@ exports["should get all dbs"] = function() {
   });
 };
 
-exports["should get UUIDs"] = function() {
+exports["test should get UUIDs"] = function() {
   var count  = 5;
   
   return when(client.uuids(count), function(uuids) {
@@ -36,7 +36,7 @@ exports["should get UUIDs"] = function() {
   });
 };
 
-exports["should get config"] = function() {
+exports["test should get config"] = function() {
   return when(client.config()
   , function(resp) {
     assert.notEqual(null, resp);
@@ -44,7 +44,7 @@ exports["should get config"] = function() {
   , function(err) { assert.ok(false, err); });
 };
 
-exports["should create and remove db"] = function() {
+exports["test should create and remove db"] = function() {
   var db = client.db(DB_NAME);
   
   return when(db.create(), 
@@ -63,7 +63,7 @@ exports["should create and remove db"] = function() {
     });
 };
 
-exports["should signup user"] = function() {
+exports["test should signup user"] = function() {
   var
     name = "tester",
     signupPromise = client.signup({ name: name }, "asdfasdf");
@@ -79,7 +79,7 @@ exports["should signup user"] = function() {
   });
 };
 
-exports["should login"] = function() {
+exports["test should login"] = function() {
   var cookieClient = couchdb.createClient({
     host: settings.host,
     port: settings.port
@@ -104,7 +104,7 @@ exports["should login"] = function() {
   });
 };
 
-exports["should get stats"] = function() {
+exports["test should get stats"] = function() {
   return when(client.stats(),
     function(resp) {
       assert.notEqual(null, resp.couchdb);
@@ -119,7 +119,7 @@ exports["should get session"] = function() {
   });
 };
 
-exports["should replicate"] = function() {
+exports["test should replicate"] = function() {
   var 
     db1 = client.db(DB_NAME),
     db2 = client.db(DB_NAME2);
@@ -166,13 +166,13 @@ exports["should replicate"] = function() {
   }
   
   var tests = {
-    "should have no documents": function() {
+    "test should have no documents": function() {
       return when(db.allDocs(), function(resp) {
         assert.ok(Array.isArray(resp.rows), "Expected resp.rows to be an array but it is '"+typeof(resp.rows)+"'");
         assert.equal(0, resp.rows.length, "Expected 0 rows, found '"+resp.rows.length+"'");
       });
     }, 
-    "should create document with id": function() {
+    "test should create document with id": function() {
       var
         docId = "ABC123",
         saveDocPromise = db.saveDoc({ _id: docId, hello: "world" });
@@ -190,18 +190,18 @@ exports["should replicate"] = function() {
         assert.ok(resp.ok);
       });
     }, 
-    "should create document without id": function() {
+    "test should create document without id": function() {
       return when(db.saveDoc({ hello: "world" }), 
         function(resp) {
           assert.ok(resp.ok);
         });
     },
-    "should get security object": function() {
+    "test should get security object": function() {
       return when(db.security(), function(resp) {
         assert.deepEqual({}, resp);
       });
     },
-    "should set security object": function() {
+    "test should set security object": function() {
       var securityObj = { readers: { names: ["tester"], roles: ["test_reader"] } };
       return when(db.security(securityObj), function(resp) { 
         assert.ok(resp.ok);
@@ -210,18 +210,19 @@ exports["should replicate"] = function() {
         })
       });
     },
-    "should remove document": function() {
+    "test should remove document": function() {
       var
         docId = "ABCZZZ",
         saveDocPromise = db.saveDoc({ _id: docId });
       
       return when(saveDocPromise, function(resp) {
+        console.log("removing " + resp.id + " " + resp.rev);
         return when(db.removeDoc(resp.id, resp.rev), function(resp) {
           assert.ok(resp.ok);
         });
       });
     },
-    "should be conflicted": function() {
+    "test should be conflicted": function() {
       return when(db.saveDoc( { _id: "hello-world" }), function() {
         var conflictPromise = db.saveDoc({ _id: "hello-world" });
         
@@ -236,13 +237,13 @@ exports["should replicate"] = function() {
           return removeDoc();
         }, function(err) { 
           assert.ok(err);
-          removeDoc();
+          return removeDoc();
         });
       });
     }
   };
     
-  exports["database tests"] = {};
+  exports["test database"] = {};
   
   var keys= [];
   for (var k in tests) {
@@ -250,7 +251,7 @@ exports["should replicate"] = function() {
   }
   
   keys.forEach(function(test) {
-    exports["database tests"][test] = function() {
+    exports["test database"][test] = function() {
       return when(before(), function() {
         return when(tests[test](), 
           function() {
