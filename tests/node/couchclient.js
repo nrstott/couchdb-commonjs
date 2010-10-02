@@ -5,17 +5,17 @@ var
   TEST_DOC = { hello: "world" },
   assert   = require("assert"),
   couchdb  = require("../../lib/couchdb"),
-  Q        = require("promise/promise"),
+  Q        = require("promise"),
   when     = Q.when,
   settings = require("./settings").couchdb,
   client   = couchdb.createClient(settings),
   sys      = require("sys");
-
+           
 exports["test should get all dbs"] = function() {
   var 
     hsaRun = false,
     response = null;
-    
+       var test = {something:function(arg1, arg2){}};
   var HttpClient = require("promise/http-client").Client;
   var httpClient = new HttpClient();
 
