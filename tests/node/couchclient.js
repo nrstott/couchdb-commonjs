@@ -240,7 +240,23 @@ exports["test should replicate"] = function() {
           return removeDoc();
         });
       });
+    },
+
+    "test should get view": function(){
+       var db = client.db(DB_NAME);
+       
+       var saveDocPromise = db.saveDoc({
+        _id: "_design/test",
+        views: { "test": { map: "function(){emit(doc._id, doc)}" } }
+       });
+
+       return when(saveDocPromise, function() {
+         return when(db.view("test", "test"), function success(resp){
+            assert.ok(resp.rows, "rows should be defined");
+         });
+       });
     }
+
   };
     
   exports["test database"] = {};
