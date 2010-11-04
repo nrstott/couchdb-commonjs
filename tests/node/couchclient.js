@@ -122,23 +122,27 @@ exports["should get session"] = function() {
 exports["test should replicate"] = function() {
   var 
     db1 = client.db(DB_NAME),
-    db2 = client.db(DB_NAME2);
+    db2 = client.db(DB_NAME2),
+    deferred = Q.defer();
   
-  return when(
-    Q.all([db1.create(), db2.create()]),
+  when(Q.all([db1.create(), db2.create()]),
     function() {
       return when(
         client.replicate(DB_NAME, DB_NAME2),
         function(resp) {
-          assert.ok(resp);
-          assert.ok(!resp.error);
+          assert.ok(resp, "Should have received a response");
+          assert.ok(!resp.error, "Response contains error: "+JSON.stringify(resp));
+          deferred.resolve();
         },
         function(err) {
-          assert.ok(false, err);
+          deferred.reject(err);
         }
       )
-    }
-  );
+    }, function onReject(rejection) { 
+      deferred.reject(JSON.stringify(rejection));
+    });
+  
+  return deferred.promise;
 };
 
 (function() {
