@@ -1,4 +1,0 @@
----
-  name: couchdb
-  description: CouchDB Client for use in Browser or NodeJS
-  version: 0.0.1
