@@ -5,7 +5,7 @@ var
   TEST_DOC = { hello: "world" },
   assert   = require("assert"),
   couchdb  = require("../../lib/couchdb"),
-  Q        = require("promise"),
+  Q        = require("promised-io/promise"),
   when     = Q.when,
   settings = require("./settings").couchdb,
   client   = couchdb.createClient(settings),
@@ -16,7 +16,7 @@ exports["test should get all dbs"] = function() {
     hsaRun = false,
     response = null;
        var test = {something:function(arg1, arg2){}};
-  var HttpClient = require("promise/http-client").Client;
+  var HttpClient = require("promised-io/http-client").Client;
   var httpClient = new HttpClient();
 
   return when(client.allDbs(), function success(resp) {
