@@ -5,7 +5,7 @@ var
   TEST_DOC = { hello: "world" },
   assert   = require("assert"),
   couchdb  = require("../../lib/couchdb"),
-  Q        = require("promised-io/promise"),
+  Q        = require("promised-io/lib/promise"),
   when     = Q.when,
   settings = require("./settings").couchdb,
   client   = couchdb.createClient(settings),
@@ -16,7 +16,7 @@ exports["test should get all dbs"] = function() {
     hsaRun = false,
     response = null;
        var test = {something:function(arg1, arg2){}};
-  var HttpClient = require("promised-io/http-client").Client;
+  var HttpClient = require("promised-io/lib/http-client").Client;
   var httpClient = new HttpClient();
 
   return when(client.allDbs(), function success(resp) {
@@ -288,5 +288,5 @@ exports["test should replicate"] = function() {
 })();
 
 if (require.main == module) {
-  require("patr/runner").run(exports);
+  require("patr/lib/runner").run(exports);
 }
