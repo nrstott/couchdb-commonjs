@@ -4,17 +4,13 @@
   "directories": { "lib": "./lib" },
   "main": "./lib/couchdb.js",
   "author": "Nathan Stott",
-  "mappings": {
-    "promised-io": "jar:http://github.com/nrstott/promised-io/zipball/master!/lib/",
-    "patr": "jar:http://github.com/kriszyp/patr/zipball/master!/lib/",
-    "json": "jar:http://github.com/kriszyp/narwhal/zipball/master!/engines/default/lib/json.js",
-    "traits": "jar:http://github.com/nrstott/traits.js/zipball/master!/lib/traits"
-  },
   "dependencies": {
-    "promised-io": ">=0.2.1",
-    "traits": ">=0.3.0"
+    "promised-io": "v0.2.3"
   },
   "devDependencies": {
-    "patr": ">=0.2.1"
+    "expresso": ">=0.8.1"
+  },
+  "scripts": {
+    "test": "expresso tests/node/couchclient.js --serial"
   }
 }
