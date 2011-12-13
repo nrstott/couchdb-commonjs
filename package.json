@@ -1,16 +1,17 @@
 {
   "name": "couchdb",
-  "version": "0.2.0a",
+  "version": "0.3.0",
   "directories": { "lib": "./lib" },
   "main": "./lib/couchdb.js",
   "author": "Nathan Stott",
   "dependencies": {
-    "promised-io": "v0.2.3"
+    "promised-io": "v0.2.3",
+    "request": "=v2.2.9"
   },
   "devDependencies": {
     "expresso": ">=0.8.1"
   },
   "scripts": {
-    "test": "expresso tests/node/couchclient.js --serial"
+    "test": "expresso tests/node/couchclient.js --serial --timeout 20000"
   }
 }

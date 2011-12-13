@@ -15,7 +15,14 @@ var
 function identity() {}
 
 function before() {
-  return db.create();
+  return db.exists().then(function(exists) {
+    if (!exists) {
+      return db.create();
+    }
+    return db;
+  }, function(err) {
+    console.log('exists err', err);
+  });
 };
 
 function test(callback) {
@@ -24,7 +31,7 @@ function test(callback) {
       done();
     }, function(err) {
       done();
-      assert.ok(false, sys.inspect(err));
+      assert.ok(false, err.stack ? err.stack : err);
     });
   };
 }
@@ -35,7 +42,7 @@ exports.setup = function(done) {
 
   var db2Promise = db2.exists().then(function(exists) {
     if (exists) {
-      return db2.remove().then(identity, function(err) {
+      return db2.remove().then(null, function(err) {
         if (err.error !== 'not_found') {
           throw err;
         }
@@ -47,7 +54,7 @@ exports.setup = function(done) {
 
   var dbPromise = db.exists().then(function(exists) {
     if (exists) {
-      return db.remove().then(identity, function(err) {
+      return db.remove().then(null, function(err) {
         if (err.error !== 'not_found') {
           throw err;
         }
@@ -125,27 +132,6 @@ exports["test should signup user"] = test(function() {
   });
 });
 
-
-exports["test should login"] = test(function() {
-  var removed = false
-    , cookieClient = couchdb.createClient({
-        host: settings.host,
-        port: settings.port
-      });
-
-  return cookieClient.login(settings.user, settings.password).then(function(resp) {
-    var db = cookieClient.db('cookie-auth-creation-test');
-
-    return db.create().then(function() {
-      return db.remove().then(function() {
-        cookieClient.logout();
-
-        assert.ok(true);
-      });
-    });
-  });
-});
-
 exports["test should get stats"] = test(function() {
   var response = null;
 
@@ -201,27 +187,24 @@ exports["test should have no documents"] = test(function() {
       assert.equal(0, resp.rows.length, "Expected 0 rows, found '"+resp.rows.length+"'");
     });
   });
-  
 });
 
 exports["test should remove document"] = test(function() {
   var docId = "ABCZZZ"
-    , response = null
-    , saveDocPromise = db.saveDoc({ _id: docId });
+    , response = null;
   
   return before().then(function() {
-      return when(saveDocPromise, function(resp) {
+      return when(db.saveDoc({ _id: docId }), function(resp) {
         return when(db.removeDoc(resp.id, resp.rev), function(resp) {
           assert.ok(resp.ok);
         });
     });
   });
 });
-/*
+
 exports["test should create document with id"] = function(beforeExit) {
 
   before().then(function() {
-    console.log('should create document with id');
     var response = null
       , docId = "ABC123"
       , saveDocPromise = db.saveDoc({ _id: docId, hello: "world" });
@@ -235,29 +218,27 @@ exports["test should create document with id"] = function(beforeExit) {
     });
 
     beforeExit(function(resp) {
-      console.log('-beforeExit');
       assert.notEqual(null, response);
       assert.ok(response.ok);
     });
           
     when(saveDocPromise, function(resp) {
       response = resp;
-    }).then(after, after);
+    });
   });
 };
+
 
 exports["test should create document without id"] = function(beforeExit) {
 
   before().then(function() {
-    console.log('should create document without id');
     var response = null;
 
     when(db.saveDoc({ hello: "world" }), function(resp) {
       response = resp;
-    }).then(after, after);
+    });
 
     beforeExit(function() {
-      console.log('--beforeExit');
       assert.ok(response.ok);
     });
   });
@@ -270,7 +251,7 @@ exports["test should get security object"] = function(beforeExit) {
 
     when(db.security(), function(resp) {
       response = resp;
-    }).then(after, after);
+    });
 
     beforeExit(function() {
       assert.deepEqual({}, response);
@@ -309,7 +290,6 @@ exports["test should be conflicted"] = function(beforeExit) {
       
       removeDoc = function() {
         return db.openDoc("hello-world").then(function(doc) {
-          console.log('got doc:'+JSON.stringify(doc));
           return db.removeDoc(doc._id, doc._rev);
         });
       }
@@ -349,4 +329,3 @@ exports["test should get view"] = function(beforeExit){
      });
   });
 }
-*/
