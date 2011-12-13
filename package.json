@@ -12,6 +12,6 @@
     "expresso": ">=0.8.1"
   },
   "scripts": {
-    "test": "expresso tests/node/couchclient.js --serial --timeout 20000"
+    "test": "expresso tests/couchclient.js --serial --timeout 20000"
   }
 }

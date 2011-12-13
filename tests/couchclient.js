@@ -4,7 +4,7 @@ var
   TEST_ID  = "ABC123",
   TEST_DOC = { hello: "world" },
   assert   = require("assert"),
-  couchdb  = require("../../lib/couchdb"),
+  couchdb  = require("../lib/couchdb"),
   Q        = require("promised-io/lib/promise"),
   when     = Q.when,
   settings = require("./settings").couchdb,
