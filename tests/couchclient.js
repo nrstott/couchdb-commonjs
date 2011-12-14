@@ -344,11 +344,16 @@ exports["test getDoc should get multiple documents"] = function(beforeExit) {
     }).then(function() {
       return db.getDoc(['doc1', 'doc2']);
     }).then(function(res) {
+      console.log('res', res);
       docs = res;
     });
+  }, function(err) {
+    console.log('err', err);
   });
 
   beforeExit(function() {
     assert.ok(Array.isArray(docs));
+    assert.ok(docs[0]._id === 'doc1');
+    assert.ok(docs[1]._id === 'doc2');
   });
 };
