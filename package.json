@@ -1,6 +1,6 @@
 {
   "name": "couchdb",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "directories": { "lib": "./lib" },
   "main": "./lib/couchdb.js",
   "author": "Nathan Stott",
