@@ -30,8 +30,9 @@ function test(callback) {
     callback().then(function() {
       done();
     }, function(err) {
-      done();
+      console.log(err);
       assert.ok(false, err.stack ? err.stack : err);
+      done();
     });
   };
 }
@@ -48,8 +49,8 @@ exports.setup = function(done) {
         }
       });
     }
-  }, function() {
-    console.log('unable to delete db');
+  }, function(err) {
+    console.log('unable to delete db', err.message, err.stack);
   });
 
   var dbPromise = db.exists().then(function(exists) {
@@ -60,8 +61,8 @@ exports.setup = function(done) {
         }
       });
     }
-  }, function() {
-    console.log('unable to delete db');
+  }, function(err) {
+    console.log('unable to delete db', err.message, err.stack);
   });
 
   Q.all([ db2Promise, dbPromise ]).then(done, function(err) {
@@ -329,3 +330,25 @@ exports["test should get view"] = function(beforeExit){
      });
   });
 }
+
+exports["test getDoc should get multiple documents"] = function(beforeExit) {
+  var docs;
+
+  before().then(function() {
+    db.saveDoc({
+      _id: 'doc1'
+    }).then(function() {
+      return db.saveDoc({
+        _id: 'doc2'
+      });
+    }).then(function() {
+      return db.getDoc(['doc1', 'doc2']);
+    }).then(function(res) {
+      docs = res;
+    });
+  });
+
+  beforeExit(function() {
+    assert.ok(Array.isArray(docs));
+  });
+};
